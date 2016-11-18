@@ -1,0 +1,298 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Verify_PerfectMatchings</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-03-21"><meta name="DC.source" content="Verify_PerfectMatchings.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Set size of the complete graph Kn</a></li><li><a href="#3">Find the perfect matchings matrix</a></li><li><a href="#4">Some checks on the accuracy of the output</a></li><li><a href="#5">Demonstrate the equivalence with the SinglePerfectMatchings approach</a></li><li><a href="#6">Demonstrate InversePerfectMatchings</a></li><li><a href="#7">Random perfect matchings for larger complete graphs</a></li></ul></div><pre class="codeinput"><span class="comment">%--------------------------------------------------------------------------</span>
+<span class="comment">% Verify_PerfectMatchings.m</span>
+<span class="comment">% Finds the perfect matchings matrix and displays some checks on the result</span>
+<span class="comment">% Random perfect matchings for larger complete graphs</span>
+<span class="comment">%--------------------------------------------------------------------------</span>
+<span class="comment">% Author: Daniel R. Herber, Graduate Student, University of Illinois at</span>
+<span class="comment">% Urbana-Champaign</span>
+<span class="comment">% Date: 07/27/2015</span>
+<span class="comment">%--------------------------------------------------------------------------</span>
+</pre><h2>Set size of the complete graph Kn<a name="2"></a></h2><p>This needs to be even (and between 2 and 20 unless you have more than 210 Gb of RAM)</p><pre class="codeinput">N = 14;
+</pre><h2>Find the perfect matchings matrix<a name="3"></a></h2><p>And display first 15 rows</p><pre class="codeinput">A = PerfectMatchings(N);
+disp(<span class="string">'First rows of A:'</span>)
+disp(A(1:min([size(A,1) 15]),:))
+</pre><pre class="codeoutput">First rows of A:
+   14    1   13    2   12    3   11    4   10    5    9    6    8    7
+   14    1   13    2   12    3   11    4   10    5    9    7    8    6
+   14    1   13    2   12    3   11    4   10    5    9    8    7    6
+   14    1   13    2   12    3   11    4   10    6    9    5    8    7
+   14    1   13    2   12    3   11    4   10    6    9    7    8    5
+   14    1   13    2   12    3   11    4   10    6    9    8    7    5
+   14    1   13    2   12    3   11    4   10    7    9    5    8    6
+   14    1   13    2   12    3   11    4   10    7    9    6    8    5
+   14    1   13    2   12    3   11    4   10    7    9    8    6    5
+   14    1   13    2   12    3   11    4   10    8    9    5    7    6
+   14    1   13    2   12    3   11    4   10    8    9    6    7    5
+   14    1   13    2   12    3   11    4   10    8    9    7    6    5
+   14    1   13    2   12    3   11    4   10    9    8    5    7    6
+   14    1   13    2   12    3   11    4   10    9    8    6    7    5
+   14    1   13    2   12    3   11    4   10    9    8    7    6    5
+
+</pre><h2>Some checks on the accuracy of the output<a name="4"></a></h2><p>these should all be the same</p><pre class="codeinput">disp(<span class="string">'Predicted number of perfect matchings (N!!):'</span>)
+disp(int2str(prod(1:2:N-1)))
+disp(<span class="string">'Length(A):'</span>)
+disp(int2str(size(A,1)))
+disp(<span class="string">'Number of unique rows:'</span>)
+[~,IA,IC] = unique(A,<span class="string">'rows'</span>); <span class="comment">% check if all the rows are unique</span>
+disp(int2str(length(IC)))
+disp(<span class="string">' '</span>)
+
+<span class="comment">% these should all be the same</span>
+disp(<span class="string">'Predicted row sum:'</span>)
+disp(int2str(sum(1:N)))
+disp(<span class="string">'Minimum row sum:'</span>)
+disp(int2str(min(sum(A,2))))
+disp(<span class="string">'Maximum row sum:'</span>)
+disp(int2str(max(sum(A,2))))
+disp(<span class="string">' '</span>)
+
+<span class="comment">% save the perfect matchings matrix (optional)</span>
+<span class="comment">% save(['P',num2str(N),'.mat'],'A','-v7.3')</span>
+</pre><pre class="codeoutput">Predicted number of perfect matchings (N!!):
+135135
+Length(A):
+135135
+Number of unique rows:
+135135
+ 
+Predicted row sum:
+105
+Minimum row sum:
+105
+Maximum row sum:
+105
+ 
+</pre><h2>Demonstrate the equivalence with the SinglePerfectMatchings approach<a name="5"></a></h2><pre class="codeinput">Asingle = SinglePerfectMatchings(1:min([size(A,1) 15]),N);
+disp(<span class="string">'First rows of A with SinglePerfectMatchings:'</span>)
+disp(Asingle)
+</pre><pre class="codeoutput">First rows of A with SinglePerfectMatchings:
+   14    1   13    2   12    3   11    4   10    5    9    6    8    7
+   14    1   13    2   12    3   11    4   10    5    9    7    8    6
+   14    1   13    2   12    3   11    4   10    5    9    8    7    6
+   14    1   13    2   12    3   11    4   10    6    9    5    8    7
+   14    1   13    2   12    3   11    4   10    6    9    7    8    5
+   14    1   13    2   12    3   11    4   10    6    9    8    7    5
+   14    1   13    2   12    3   11    4   10    7    9    5    8    6
+   14    1   13    2   12    3   11    4   10    7    9    6    8    5
+   14    1   13    2   12    3   11    4   10    7    9    8    6    5
+   14    1   13    2   12    3   11    4   10    8    9    5    7    6
+   14    1   13    2   12    3   11    4   10    8    9    6    7    5
+   14    1   13    2   12    3   11    4   10    8    9    7    6    5
+   14    1   13    2   12    3   11    4   10    9    8    5    7    6
+   14    1   13    2   12    3   11    4   10    9    8    6    7    5
+   14    1   13    2   12    3   11    4   10    9    8    7    6    5
+
+</pre><h2>Demonstrate InversePerfectMatchings<a name="6"></a></h2><pre class="codeinput">II = zeros(size(Asingle,2),1);
+<span class="keyword">for</span> i = 1:size(Asingle,2)
+    II(i) = InversePerfectMatchings(Asingle(i,:));
+<span class="keyword">end</span>
+disp(<span class="string">'InversePerfectMatchings returns the # given the PM graph:'</span>)
+disp(<span class="string">'PM #s for previous graphs:'</span>)
+disp(II)
+</pre><pre class="codeoutput">InversePerfectMatchings returns the # given the PM graph:
+PM #s for previous graphs:
+     1
+     2
+     3
+     4
+     5
+     6
+     7
+     8
+     9
+    10
+    11
+    12
+    13
+    14
+
+</pre><h2>Random perfect matchings for larger complete graphs<a name="7"></a></h2><p>20 random matchings with N = 30</p><pre class="codeinput">Nsingle = 30; Nrand = 20;
+I = randi([1 prod(1:2:Nsingle-1)],1,Nrand);
+Arand = SinglePerfectMatchings(I,Nsingle);
+disp(Arand)
+</pre><pre class="codeoutput">  Columns 1 through 15
+
+   30   16   29   25   28    8   27   19   26    2   24   15   23    7   22
+   30    9   29   18   28    1   27   14   26    2   25   19   24   21   23
+   30   22   29   17   28    3   27   10   26    8   25   18   24    7   23
+   30    6   29   14   28   26   27   21   25    7   24   17   23    9   22
+   30   20   29   26   28   19   27   15   25   10   24   21   23    6   22
+   30    6   29   10   28   20   27    7   26    9   25   14   24   18   23
+   30   11   29   20   28   15   27    2   26   25   24   13   23    1   22
+   30   19   29    4   28   24   27   13   26    3   25   11   23   12   22
+   30   23   29   17   28   25   27   24   26   20   22   16   21   18   19
+   30    3   29   11   28   16   27    1   26   22   25   20   24   19   23
+   30   27   29   26   28   18   25   17   24   19   23   15   22   13   21
+   30   23   29   14   28   10   27   16   26    6   25    2   24    1   22
+   30   15   29    4   28    5   27   25   26   20   24    1   23    9   22
+   30   13   29   19   28    7   27   25   26   11   24    2   23   18   22
+   30   13   29   27   28   22   26   20   25    5   24   11   23    4   21
+   30    9   29   25   28   23   27   20   26    5   24    1   22    6   21
+   30   15   29   22   28    5   27    2   26    9   25   13   24   11   23
+   30   15   29   23   28   26   27    9   25    3   24   16   22   19   21
+   30   24   29   20   28    6   27    2   26   12   25    4   23   14   22
+   30   24   29    2   28   10   27   21   26   25   23   11   22   19   20
+
+  Columns 16 through 30
+
+   13   21   20   18   17   14    6   12    1   11    4   10    9    5    3
+   10   22    3   20   11   17    5   16    4   15    7   13    8   12    6
+    5   21    6   20   11   19   15   16    9   14    4   13    1   12    2
+   12   20    5   19    2   18   13   16   10   15    3   11    1    8    4
+    9   18   17   16    4   14    1   13    8   12    3   11    5    7    2
+    8   22    4   21   16   19   13   17    1   15    5   12   11    3    2
+    4   21    5   19   17   18   12   16    8   14    7   10    6    9    3
+    6   21   16   20   15   18    9   17   14   10    7    8    2    5    1
+    5   15    6   14    9   13    4   12    3   11    1   10    7    8    2
+   14   21   13   18   17   15    8   12    7   10    9    6    5    4    2
+    2   20   12   16    7   14   10   11    1    9    5    8    6    4    3
+   19   21   15   20    7   18    4   17    9   13   11   12    8    5    3
+   10   21   17   19    3   18   13   16    6   14   12   11    2    8    7
+    8   21    1   20   12   17   10   16    3   15   14    9    5    6    4
+   16   19    8   18    7   17    1   15    6   14    2   12   10    9    3
+   17   19    4   18   16   15   11   14    7   13    3   12    2   10    8
+   10   21   17   20   14   19    8   18    7   16    4   12    3    6    1
+   13   20    7   18    1   17   12   14    5   11    6   10    8    4    2
+   10   21   19   18   13   17   15   16    9   11    5    8    7    3    1
+    4   18    8   17   12   16    3   15   14   13    5    9    7    6    1
+
+</pre><p><img vspace="5" hspace="5" src="Image.PNG" alt=""> </p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Verify_PerfectMatchings.m
+% Finds the perfect matchings matrix and displays some checks on the result
+% Random perfect matchings for larger complete graphs
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+% Author: Daniel R. Herber, Graduate Student, University of Illinois at
+% Urbana-Champaign
+% Date: 07/27/2015
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+%% Set size of the complete graph Kn
+% This needs to be even
+% (and between 2 and 20 unless you have more than 210 Gb of RAM)
+N = 14;
+
+%% Find the perfect matchings matrix
+% And display first 15 rows
+A = PerfectMatchings(N);
+disp('First rows of A:')
+disp(A(1:min([size(A,1) 15]),:))
+
+%% Some checks on the accuracy of the output
+% these should all be the same
+disp('Predicted number of perfect matchings (N!!):')
+disp(int2str(prod(1:2:N-1)))
+disp('Length(A):')
+disp(int2str(size(A,1)))
+disp('Number of unique rows:')
+[~,IA,IC] = unique(A,'rows'); % check if all the rows are unique
+disp(int2str(length(IC)))
+disp(' ')
+
+% these should all be the same
+disp('Predicted row sum:')
+disp(int2str(sum(1:N)))
+disp('Minimum row sum:')
+disp(int2str(min(sum(A,2))))
+disp('Maximum row sum:')
+disp(int2str(max(sum(A,2))))
+disp(' ')
+
+% save the perfect matchings matrix (optional)
+% save(['P',num2str(N),'.mat'],'A','-v7.3')
+
+%% Demonstrate the equivalence with the SinglePerfectMatchings approach
+Asingle = SinglePerfectMatchings(1:min([size(A,1) 15]),N);
+disp('First rows of A with SinglePerfectMatchings:')
+disp(Asingle)
+
+%% Demonstrate InversePerfectMatchings
+II = zeros(size(Asingle,2),1);
+for i = 1:size(Asingle,2)
+    II(i) = InversePerfectMatchings(Asingle(i,:));
+end
+disp('InversePerfectMatchings returns the # given the PM graph:')
+disp('PM #s for previous graphs:')
+disp(II)
+
+%% Random perfect matchings for larger complete graphs
+% 20 random matchings with N = 30
+Nsingle = 30; Nrand = 20;
+I = randi([1 prod(1:2:Nsingle-1)],1,Nrand);
+Arand = SinglePerfectMatchings(I,Nsingle);
+disp(Arand)
+
+%%
+% 
+% <<Image.PNG>>
+% 
+##### SOURCE END #####
+--></body></html>
