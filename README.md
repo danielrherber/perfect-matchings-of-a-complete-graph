@@ -1,7 +1,7 @@
 # README #
 Recursive algorithm for the (N-1)!! perfect matchings of Kn and incomplete listings for large N.
 
-![image](examples/image.png)
+![image](examples/Image.png)
 
 ### Install ###
 Just make sure the files are in your MATLAB path.
